@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ali Rasheed Gaming Hub</title>
+<style>html{background:#090a14}body{margin:0}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky HUD-Navigation, eine Seite pro Hash-Route, Startseite mit Hero, Info-Block und Level-Karten */
+:root {
+  --bg: #090a14;
+  --surface: #12142a;
+  --surface-2: #1a1d3b;
+  --line: #2a2e5a;
+  --fg: #e9ebff;
+  --muted: #9aa0cf;
+  --violet: #7c5cff;
+  --teal: #19e3c1;
+  --hot: #ff4d8d;
+  --display: "Chakra Petch", "Trebuchet MS", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 40; }
+a { color: var(--teal); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+.wrap { width: 100%; max-width: 1120px; margin-inline: auto; }
+.mono { font-family: var(--mono); }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); }
+
+/* Header */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+.logo { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--fg); text-decoration: none; letter-spacing: 0.04em; white-space: nowrap; }
+.logo span { color: var(--hot); }
+nav ul { list-style: none; display: flex; gap: 4px; margin: 0; padding: 0; align-items: center; }
+nav a.nl { display: block; padding: 9px 14px; color: var(--muted); text-decoration: none; font-family: var(--display); font-weight: 500; font-size: 16px; letter-spacing: 0.03em; border-radius: 4px; }
+nav a.nl:hover { color: var(--fg); background: var(--surface); }
+nav a.nl.on { color: var(--fg); box-shadow: inset 0 -2px 0 var(--teal); }
+nav a.home { font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 0.08em; color: #06120f; background: var(--teal); padding: 10px 20px; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); margin-right: 10px; }
+nav a.home:hover { background: #5af0d6; color: #06120f; }
+nav a.nl.home.on { box-shadow: none; background: var(--teal); color: #06120f; outline: 2px solid var(--fg); outline-offset: 3px; }
+nav a.nl.home { color: #06120f; box-shadow: 0 0 22px rgba(25,227,193,.45); }
+.burger { display: none; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 10px 14px; font-family: var(--display); font-weight: 600; font-size: 15px; cursor: pointer; }
+@media (max-width: 860px) {
+  .burger { display: block; }
+  nav { position: absolute; left: 0; right: 0; top: 100%; background: var(--surface); border-bottom: 1px solid var(--line); padding: 12px max(16px, env(safe-area-inset-left, 0px)) 18px; display: none; }
+  nav.open { display: block; }
+  nav ul { flex-direction: column; align-items: stretch; }
+  nav a.home { margin: 0 0 8px; text-align: center; clip-path: none; border-radius: 4px; }
+  nav a.nl { padding: 12px 14px; }
+}
+
+main { flex: 1; padding-block: 40px 72px; }
+.page { display: none; }
+.page.show { display: block; animation: rise .45s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* Hero */
+.hero { position: relative; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: radial-gradient(900px 380px at 85% -10%, rgba(124,92,255,.35), transparent 60%), radial-gradient(600px 300px at 0% 110%, rgba(25,227,193,.16), transparent 60%), var(--surface); }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .7; }
+.hero-in { position: relative; padding: clamp(28px, 6vw, 72px); display: grid; gap: 22px; }
+.greet { font-family: var(--display); font-weight: 700; font-size: clamp(44px, 9vw, 104px); line-height: 1; margin: 0; }
+.greet .word { display: inline-block; color: var(--teal); text-shadow: 0 0 28px rgba(25,227,193,.45); min-width: 1ch; }
+.caret { display: inline-block; width: .08em; height: .85em; background: var(--hot); margin-left: .06em; vertical-align: -0.05em; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.lead { font-size: clamp(18px, 2.4vw, 22px); max-width: 38em; color: var(--fg); margin: 0; }
+.lead b { font-weight: 600; color: var(--hot); }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-block; font-family: var(--display); font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: .08em; padding: 13px 26px; text-decoration: none; clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.btn.p { background: var(--hot); color: #19030c; }
+.btn.p:hover { background: #ff7aa9; }
+.btn.s { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--violet); clip-path: none; border-radius: 4px; }
+.btn.s:hover { background: var(--violet); }
+.hud { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.hud div { background: color-mix(in srgb, var(--bg) 70%, transparent); padding: 12px 16px; min-width: 0; }
+.hud dt { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.hud dd { margin: 2px 0 0; font-family: var(--display); font-weight: 600; font-size: 17px; }
+.hud-wrap { margin: 0; }
+
+/* Info */
+.about-site { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: clamp(24px, 5vw, 64px); padding-block: 64px 24px; align-items: start; }
+.about-site h2 { font-size: clamp(28px, 4vw, 42px); margin-top: 8px; }
+.about-site p { margin: 0 0 14px; color: var(--muted); max-width: 60ch; }
+.about-site p:first-of-type { color: var(--fg); font-size: 19px; }
+.goals { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
+.goals li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; }
+.goals .tag { font-family: var(--mono); font-size: 12px; color: var(--teal); border: 1px solid var(--teal); padding: 1px 8px; border-radius: 3px; white-space: nowrap; }
+@media (max-width: 800px) { .about-site { grid-template-columns: 1fr; padding-top: 48px; } }
+
+/* Level cards */
+.sec-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin: 40px 0 22px; }
+.sec-head h2 { font-size: clamp(26px, 3.6vw, 38px); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.card { display: flex; flex-direction: column; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; text-decoration: none; color: var(--fg); transition: transform .2s, border-color .2s, box-shadow .2s; }
+.card:hover { transform: translateY(-4px); border-color: var(--c, var(--violet)); box-shadow: 0 14px 34px -14px var(--c, var(--violet)); }
+.card .art { aspect-ratio: 16 / 9; max-width: 100%; background: var(--surface-2); display: block; }
+.card .art svg { width: 100%; height: 100%; display: block; }
+.card .txt { padding: 18px 20px 22px; display: grid; gap: 8px; flex: 1; align-content: start; }
+.card h3 { font-size: 24px; }
+.card p { margin: 0; color: var(--muted); font-size: 16px; }
+.chip { justify-self: start; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; padding: 3px 9px; border-radius: 3px; border: 1px solid currentColor; }
+.chip.live { color: var(--teal); }
+.chip.soon { color: var(--muted); }
+.card .go { font-family: var(--display); font-weight: 600; color: var(--c, var(--violet)); margin-top: auto; padding-top: 6px; }
+
+/* Sub pages */
+.ph { margin-bottom: 36px; display: grid; gap: 10px; }
+.ph h1 { font-size: clamp(38px, 7vw, 72px); }
+.ph p { margin: 0; color: var(--muted); max-width: 60ch; font-size: 19px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 24px; min-width: 0; }
+.panel h2 { font-size: 24px; margin-bottom: 14px; }
+.panel p { margin: 0 0 12px; }
+.panel p:last-child { margin-bottom: 0; }
+.stack { display: grid; gap: 20px; min-width: 0; }
+.quest { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.quest li { position: relative; padding: 0 0 22px 28px; border-left: 2px solid var(--line); margin-left: 6px; }
+.quest li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.quest li::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; background: var(--bg); border: 2px solid var(--teal); transform: rotate(45deg); }
+.quest li.now::before { background: var(--hot); border-color: var(--hot); box-shadow: 0 0 14px var(--hot); }
+.quest time { font-family: var(--mono); font-size: 13px; color: var(--teal); }
+.quest h3 { font-size: 19px; margin: 2px 0 4px; }
+.quest p { color: var(--muted); font-size: 16px; margin: 0; }
+.skills { display: grid; gap: 14px; }
+.skill { display: grid; gap: 6px; }
+.skill .row { display: flex; justify-content: space-between; gap: 12px; font-family: var(--display); font-weight: 600; }
+.skill .row span:last-child { font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-align: right; }
+.pips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.pips i { height: 8px; background: var(--surface-2); transform: skewX(-20deg); }
+.pips i.f { background: linear-gradient(90deg, var(--violet), var(--teal)); }
+.facts { display: grid; gap: 12px; margin: 0; }
+.facts div { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px dashed var(--line); padding-bottom: 10px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-weight: 600; text-align: right; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tags span { font-family: var(--mono); font-size: 13px; background: var(--surface-2); border: 1px solid var(--line); padding: 4px 12px; border-radius: 3px; }
+
+.empty { border: 2px dashed var(--line); border-radius: 6px; padding: clamp(36px, 8vw, 90px) 24px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+.empty svg { width: 96px; height: 96px; }
+.empty h2 { font-size: 26px; }
+.empty p { margin: 0; color: var(--muted); max-width: 40ch; }
+
+/* Contact */
+.contact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.contact-list li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; min-width: 0; }
+.contact-list .k { grid-column: 1 / -1; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.contact-list .v { font-family: var(--display); font-weight: 600; font-size: 19px; overflow-wrap: anywhere; min-width: 0; }
+.copy { background: transparent; color: var(--teal); border: 1px solid var(--teal); border-radius: 3px; padding: 6px 12px; font-family: var(--mono); font-size: 12px; cursor: pointer; }
+.copy:hover { background: var(--teal); color: #06120f; }
+
+/* Legal */
+.legal { max-width: 760px; }
+.legal h2 { font-size: 22px; margin: 28px 0 8px; }
+.legal p, .legal li { color: var(--muted); }
+.legal p { margin: 0 0 12px; }
+.legal address { font-style: normal; color: var(--fg); margin-bottom: 12px; }
+.legal ul { padding-left: 20px; margin: 0 0 12px; }
+
+/* Footer */
+footer.foot { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); background: #060710; border-top: 1px solid var(--line); padding-block: 44px calc(28px + env(safe-area-inset-bottom, 0px)); }
+.foot-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 32px; }
+@media (max-width: 760px) { .foot-grid { grid-template-columns: 1fr; } }
+.foot h4 { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); margin: 0 0 12px; font-weight: 500; }
+.foot address { font-style: normal; color: var(--muted); font-size: 16px; overflow-wrap: anywhere; }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.foot a { color: var(--fg); text-decoration: none; }
+.foot a:hover { color: var(--teal); text-decoration: underline; }
+.foot .small { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+/* Seitenwechsel-Animation */
+.wipe { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; visibility: hidden; }
+.wipe.on { visibility: visible; }
+.wipe .b { position: absolute; inset: 0; transform: translateX(-101%); }
+.wipe .b1 { background: var(--violet); }
+.wipe .b2 { background: var(--bg); border-left: 5px solid var(--teal); box-shadow: -18px 0 40px rgba(25,227,193,.35); display: grid; place-content: center; text-align: center; gap: 6px; }
+.wipe .k { font-family: var(--mono); font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--teal); }
+.wipe .n { font-family: var(--display); font-weight: 700; font-size: clamp(36px, 9vw, 84px); color: var(--fg); line-height: 1.05; }
+.wipe .bar2 { width: min(240px, 60vw); height: 6px; background: var(--surface-2); margin: 14px auto 0; transform: skewX(-20deg); overflow: hidden; }
+.wipe .bar2 i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--violet), var(--teal)); transform-origin: left; transform: scaleX(0); }
+</style>
+
+
+<div class="wipe" id="wipe" aria-hidden="true"><div class="b b1"></div><div class="b b2"><span class="k">Level wird geladen</span><span class="n" id="wname"></span><span class="bar2"><i id="wfill"></i></span></div></div>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="#startseite">ALI<span>.</span>RASHEED</a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">Menü</button>
+    <nav id="nav" aria-label="Hauptmenü">
+      <ul>
+        <li><a class="nl home" href="#startseite" data-link="startseite">Startseite</a></li>
+        <li><a class="nl" href="#ueber-mich" data-link="ueber-mich">Über mich</a></li>
+        <li><a class="nl" href="#projekte" data-link="projekte">Projekte</a></li>
+        <li><a class="nl" href="#blog" data-link="blog">Blog</a></li>
+        <li><a class="nl" href="#lernplan" data-link="lernplan">Lernplan</a></li>
+        <li><a class="nl" href="#kontakt" data-link="kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- STARTSEITE -->
+  <section class="page" id="p-startseite" aria-labelledby="h-start">
+    <div class="hero">
+      <canvas id="fx" aria-hidden="true"></canvas>
+      <div class="hero-in">
+        <span class="eyebrow">Spieler 1 hat das Spiel betreten</span>
+        <h1 class="greet" id="h-start"><span class="word" id="word">Willkommen</span><span class="caret" aria-hidden="true"></span><br>auf meiner Seite.</h1>
+        <p class="lead">Ich bin <b>Ali</b>, programmiere gern und spiele noch lieber. Schön, dass du hier bist. Setz dich, schau dich um und such dir dein erstes Level aus.</p>
+        <div class="ctas">
+          <a class="btn p" href="#ueber-mich">Spieler kennenlernen</a>
+          <a class="btn s" href="#kontakt">Kontakt aufnehmen</a>
+        </div>
+        <dl class="hud hud-wrap">
+          <div><dt>Spieler</dt><dd>Ali Rasheed</dd></div>
+          <div><dt>Basis</dt><dd>Hanau</dd></div>
+          <div><dt>Klasse</dt><dd>Entwickler in Ausbildung</dd></div>
+          <div><dt>Hauptquest</dt><dd>Fachinformatiker Anwendungsentwicklung</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="about-site">
+      <div>
+        <span class="eyebrow">Missionsbeschreibung</span>
+        <h2>Wofür ist diese Seite gedacht?</h2>
+      </div>
+      <div>
+        <p>Das hier ist mein persönlicher Spawnpunkt im Netz. Ich stelle hier meine Projekte vor, halte fest, was ich gerade lerne, und zeige, wer hinter dem Namen steckt.</p>
+        <p>Programmieren und Computerspiele gehören bei mir zusammen. Beides lebt von Logik, Ausdauer und dem Spaß am nächsten Level.</p>
+        <ul class="goals">
+          <li><span class="tag">Projekte</span><span>Programmier- und Webprojekte, die ich gebaut habe.</span></li>
+          <li><span class="tag">Blog</span><span>Notizen zu Code, Games und dem, was ich dabei lerne.</span></li>
+          <li><span class="tag">Lernplan</span><span>Mein Weg zum Fachinformatiker, Schritt für Schritt.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div><span class="eyebrow">Levelauswahl</span><h2>Wähle dein Level</h2></div>
+    </div>
+    <div class="cards">
+      <a class="card" href="#ueber-mich" style="--c:var(--teal)">
+        <span class="art"><svg viewBox="0 0 320 180" role="img" aria-label="Illustration: Spielcontroller"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d2b33"/><stop offset="1" stop-color="#1b1648"/></linearGradient></defs><rect width="320" height="180" fill="url(#g1)"/><g stroke="#19e3c1" stroke-opacity=".12"><path d="M0 40H320M0 90H320M0 140H320M60 0V180M160 0V180M260 0V180"/></g><path d="M92 62h136c24 0 38 26 46 56 4 16-6 30-20 28-10-1-17-8-24-18-4-6-8-8-14-8H104c-6 0-10 2-14 8-7 10-14 17-24 18-14 2-24-12-20-28 8-30 22-56 46-56z" fill="#12142a" stroke="#19e3c1" stroke-width="3"/><path d="M104 88v26M91 101h26" stroke="#19e3c1" stroke-width="6" stroke-linecap="round"/><circle cx="218" cy="92" r="7" fill="#ff4d8d"/><circle cx="238" cy="108" r="7" fill="#7c5cff"/><circle cx="198" cy="108" r="7" fill="#19e3c1"/></svg></span>
+        <span class="txt"><span class="chip live">Freigeschaltet</span><h3>Über mich</h3><p>Wer ich bin, was ich kann und wie mein bisheriger Weg aussieht.</p><span class="go">Level starten →</span></span>
+      </a>
+      <a class="card" href="#projekte" style="--c:var(--violet)">
+        <span class="art"><svg viewBox="0 0 320 180" role="img" aria-label="Illustration: gestapelte Würfel"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d1450"/><stop offset="1" stop-color="#0b0c20"/></linearGradient></defs><rect width="320" height="180" fill="url(#g2)"/><g stroke="#7c5cff" stroke-width="3" stroke-linejoin="round"><path d="M160 34l50 26v52l-50 26-50-26V60z" fill="#1a1d3b"/><path d="M110 60l50 26 50-26M160 86v52" fill="none"/></g><path d="M160 34l50 26-50 26-50-26z" fill="#7c5cff" fill-opacity=".45"/><g stroke="#19e3c1" stroke-width="2" fill="#12142a"><path d="M240 96l24 12v26l-24 12-24-12v-26z"/><path d="M60 100l22 11v24l-22 11-22-11v-24z"/></g></svg></span>
+        <span class="txt"><span class="chip soon">Bald verfügbar</span><h3>Projekte</h3><p>Hier erscheinen meine Programmier- und Webprojekte.</p><span class="go">Level ansehen →</span></span>
+      </a>
+      <a class="card" href="#blog" style="--c:var(--hot)">
+        <span class="art"><svg viewBox="0 0 320 180" role="img" aria-label="Illustration: Schriftrolle"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a0f2b"/><stop offset="1" stop-color="#12142a"/></linearGradient></defs><rect width="320" height="180" fill="url(#g3)"/><rect x="84" y="36" width="152" height="108" rx="6" fill="#1a1d3b" stroke="#ff4d8d" stroke-width="3"/><g stroke="#ff4d8d" stroke-width="5" stroke-linecap="round"><path d="M108 66h104M108 88h84M108 110h96" stroke-opacity=".9"/></g><rect x="72" y="30" width="176" height="14" rx="7" fill="#ff4d8d"/><rect x="72" y="136" width="176" height="14" rx="7" fill="#ff4d8d"/></svg></span>
+        <span class="txt"><span class="chip soon">Bald verfügbar</span><h3>Blog</h3><p>Gedanken zu Code, Games und dem, was ich unterwegs lerne.</p><span class="go">Level ansehen →</span></span>
+      </a>
+      <a class="card" href="#lernplan" style="--c:#ffb454">
+        <span class="art"><svg viewBox="0 0 320 180" role="img" aria-label="Illustration: Skill-Baum"><defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a2a0c"/><stop offset="1" stop-color="#12142a"/></linearGradient></defs><rect width="320" height="180" fill="url(#g4)"/><g stroke="#ffb454" stroke-width="3" fill="none"><path d="M160 146V108M160 108L100 70M160 108L220 70M100 70V44M220 70V44M160 108V44"/></g><g fill="#12142a" stroke="#ffb454" stroke-width="3"><circle cx="160" cy="146" r="14"/><circle cx="160" cy="108" r="11"/><circle cx="100" cy="70" r="11"/><circle cx="220" cy="70" r="11"/><circle cx="100" cy="40" r="9"/><circle cx="160" cy="40" r="9"/><circle cx="220" cy="40" r="9"/></g><circle cx="160" cy="146" r="6" fill="#ffb454"/></svg></span>
+        <span class="txt"><span class="chip soon">Bald verfügbar</span><h3>Lernplan</h3><p>Mein Skill-Baum auf dem Weg zum Fachinformatiker.</p><span class="go">Level ansehen →</span></span>
+      </a>
+      <a class="card" href="#kontakt" style="--c:var(--teal)">
+        <span class="art"><svg viewBox="0 0 320 180" role="img" aria-label="Illustration: Funksignal"><defs><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b2d2c"/><stop offset="1" stop-color="#12142a"/></linearGradient></defs><rect width="320" height="180" fill="url(#g5)"/><g fill="none" stroke="#19e3c1" stroke-width="4" stroke-linecap="round"><path d="M110 60a70 70 0 0 0 0 60" stroke-opacity=".5"/><path d="M130 70a48 48 0 0 0 0 40" stroke-opacity=".8"/><path d="M210 60a70 70 0 0 1 0 60" stroke-opacity=".5"/><path d="M190 70a48 48 0 0 1 0 40" stroke-opacity=".8"/></g><circle cx="160" cy="90" r="16" fill="#19e3c1"/><path d="M160 106v44M140 150h40" stroke="#19e3c1" stroke-width="4" stroke-linecap="round"/></svg></span>
+        <span class="txt"><span class="chip live">Freigeschaltet</span><h3>Kontakt</h3><p>Schreib mir oder ruf an. Ich freue mich über jede Nachricht.</p><span class="go">Level starten →</span></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ÜBER MICH -->
+  <section class="page" id="p-ueber-mich" aria-labelledby="h-um">
+    <div class="ph">
+      <span class="eyebrow">Charakterbogen</span>
+      <h1 id="h-um">Über mich</h1>
+      <p>Ich bin Ali, wohne in Hanau und will Fachinformatiker für Anwendungsentwicklung werden. Dass mir Technik liegt, habe ich schon in der Schule gemerkt. Seitdem baue ich Webseiten, lerne Programmiersprachen und kümmere mich in einer Kanzlei um die IT.</p>
+    </div>
+    <div class="grid2">
+      <div class="stack">
+        <div class="panel">
+          <h2>Quest-Log</h2>
+          <p class="mono" style="color:var(--muted)">Kommt noch.</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="panel">
+          <h2>Skills</h2>
+          <div class="skills">
+            <div class="skill"><div class="row"><span>Java</span><span>Praxis</span></div><div class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></div></div>
+            <div class="skill"><div class="row"><span>HTML &amp; JavaScript</span><span>Praxis</span></div><div class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></div></div>
+            <div class="skill"><div class="row"><span>WordPress</span><span>Praxis</span></div><div class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></div></div>
+            <div class="skill"><div class="row"><span>C++ &amp; Git</span><span>Autodidakt</span></div><div class="pips"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div></div>
+            <div class="skill"><div class="row"><span>Python &amp; CSS</span><span>Grundkenntnisse</span></div><div class="pips"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Sprachen</h2>
+          <dl class="facts">
+            <div><dt>Deutsch</dt><dd>C2</dd></div>
+            <div><dt>Englisch</dt><dd>C1</dd></div>
+            <div><dt>Urdu</dt><dd>B1</dd></div>
+          </dl>
+        </div>
+        <div class="panel">
+          <h2>Inventar</h2>
+          <div class="tags"><span>Programmieren</span><span>Computerspiele</span><span>Lesen</span><span>Kundenservice</span><span>Führerschein Klasse B</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJEKTE -->
+  <section class="page" id="p-projekte" aria-labelledby="h-pr">
+    <div class="ph"><span class="eyebrow">Level 02</span><h1 id="h-pr">Projekte</h1></div>
+    <div class="empty">
+      <svg viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke="#7c5cff" stroke-width="3" stroke-linejoin="round"><path d="M48 12l32 17v38L48 84 16 67V29z"/><path d="M16 29l32 17 32-17M48 46v38" stroke-opacity=".6"/></g></svg>
+      <h2>Dieses Level ist noch leer</h2>
+      <p>Hier erscheinen bald meine Projekte.</p>
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section class="page" id="p-blog" aria-labelledby="h-bl">
+    <div class="ph"><span class="eyebrow">Level 03</span><h1 id="h-bl">Blog</h1></div>
+    <div class="empty">
+      <svg viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke="#ff4d8d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="16" width="56" height="64" rx="5"/><path d="M32 36h32M32 50h32M32 64h20" stroke-opacity=".6"/></g></svg>
+      <h2>Noch keine Beiträge</h2>
+      <p>Hier erscheinen bald meine ersten Texte.</p>
+    </div>
+  </section>
+
+  <!-- LERNPLAN -->
+  <section class="page" id="p-lernplan" aria-labelledby="h-lp">
+    <div class="ph"><span class="eyebrow">Level 04</span><h1 id="h-lp">Lernplan</h1></div>
+    <div class="empty">
+      <svg viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke="#ffb454" stroke-width="3" stroke-linecap="round"><path d="M48 80V56M48 56L26 38M48 56l22-18M26 38V20M70 38V20M48 56V20" stroke-opacity=".7"/><circle cx="48" cy="82" r="6"/></g></svg>
+      <h2>Der Skill-Baum wächst noch</h2>
+      <p>Hier erscheint bald mein Lernplan.</p>
+    </div>
+  </section>
+
+  <!-- KONTAKT -->
+  <section class="page" id="p-kontakt" aria-labelledby="h-ko">
+    <div class="ph">
+      <span class="eyebrow">Level 05</span>
+      <h1 id="h-ko">Kontakt</h1>
+      <p>Du hast eine Frage, ein Angebot oder willst einfach Hallo sagen? Schreib mir oder ruf an.</p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h2>Direkt erreichbar</h2>
+        <ul class="contact-list">
+          <li><span class="k">E-Mail</span><span class="v" id="c-mail">ali.rasheed6640@gmail.com</span><button class="copy" data-copy="ali.rasheed6640@gmail.com" type="button">Kopieren</button></li>
+          <li><span class="k">Telefon</span><span class="v" id="c-tel">0176 84602425</span><button class="copy" data-copy="0176 84602425" type="button">Kopieren</button></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Gut zu wissen</h2>
+        <p>Am schnellsten erreichst du mich per E-Mail. Ich antworte so bald wie möglich.</p>
+        <p>Wie ich mit deinen Daten umgehe, steht in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPRESSUM -->
+  <section class="page" id="p-impressum" aria-labelledby="h-im">
+    <div class="ph"><span class="eyebrow">Rechtliches</span><h1 id="h-im">Impressum</h1></div>
+    <div class="legal">
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <address>Ali Rasheed<br>Hanau, Deutschland</address>
+      <h2>Kontakt</h2>
+      <p>Telefon: 0176 84602425<br>E-Mail: ali.rasheed6640@gmail.com</p>
+      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+      <address>Ali Rasheed, Hanau</address>
+      <h2>Haftung für Inhalte</h2>
+      <p>Als Diensteanbieter bin ich nach den allgemeinen Gesetzen für eigene Inhalte auf diesen Seiten verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben unberührt. Eine Haftung ist erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden entsprechender Rechtsverletzungen entferne ich diese Inhalte umgehend.</p>
+      <h2>Haftung für Links</h2>
+      <p>Diese Seite kann Links zu externen Webseiten Dritter enthalten, auf deren Inhalte ich keinen Einfluss habe. Für diese fremden Inhalte kann ich keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter verantwortlich. Bei Bekanntwerden von Rechtsverletzungen entferne ich solche Links umgehend.</p>
+      <h2>Urheberrecht</h2>
+      <p>Die von mir erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Vervielfältigung, Bearbeitung und Verbreitung außerhalb der Grenzen des Urheberrechts bedürfen meiner schriftlichen Zustimmung.</p>
+    </div>
+  </section>
+
+  <!-- DATENSCHUTZ -->
+  <section class="page" id="p-datenschutz" aria-labelledby="h-ds">
+    <div class="ph"><span class="eyebrow">Rechtliches</span><h1 id="h-ds">Datenschutzerklärung</h1></div>
+    <div class="legal">
+      <h2>1. Verantwortlicher</h2>
+      <address>Ali Rasheed<br>Hanau<br>E-Mail: ali.rasheed6640@gmail.com<br>Telefon: 0176 84602425</address>
+      <h2>2. Allgemeines zur Datenverarbeitung</h2>
+      <p>Ich verarbeite personenbezogene Daten nur, soweit das für den Betrieb dieser Webseite und die Bereitstellung meiner Inhalte nötig ist. Rechtsgrundlage ist in der Regel Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem sicheren und funktionsfähigen Webauftritt) oder, bei einer Kontaktaufnahme, Art. 6 Abs. 1 lit. b oder lit. f DSGVO.</p>
+      <h2>3. Hosting und Server-Logfiles</h2>
+      <p>Beim Aufruf dieser Seite werden technisch bedingt Daten an den Server übertragen und kurzzeitig in Logfiles gespeichert, zum Beispiel IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browsertyp und Betriebssystem. Das ist nötig, um die Seite auszuliefern und ihre Sicherheit zu gewährleisten. Eine Zusammenführung mit anderen Datenquellen findet nicht statt. Die Seite wird bei einem externen Hosting-Anbieter betrieben, der in meinem Auftrag Daten verarbeitet.</p>
+      <h2>4. Keine Cookies, kein Tracking</h2>
+      <p>Diese Seite setzt keine Cookies und verwendet keine Analyse- oder Werbe-Tools.</p>
+      <h2>5. Schriftarten (Google Fonts)</h2>
+      <p>Zur einheitlichen Darstellung lädt diese Seite Schriftarten von Google Fonts (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland). Dabei kann deine IP-Adresse an Google übermittelt werden. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Weitere Informationen findest du unter policies.google.com/privacy.</p>
+      <h2>6. Kontaktaufnahme</h2>
+      <p>Wenn du mir per E-Mail oder Telefon schreibst, speichere ich deine Angaben, um dein Anliegen zu bearbeiten und für Anschlussfragen. Ich gebe sie nicht ohne deine Einwilligung weiter und lösche sie, sobald sie nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
+      <h2>7. Externe Links</h2>
+      <p>Wenn du einem Link zu einer fremden Webseite folgst, gilt dort die Datenschutzerklärung des jeweiligen Betreibers.</p>
+      <h2>8. Deine Rechte</h2>
+      <p>Du hast gegenüber mir folgende Rechte in Bezug auf deine personenbezogenen Daten:</p>
+      <ul>
+        <li>Auskunft (Art. 15 DSGVO)</li>
+        <li>Berichtigung (Art. 16 DSGVO)</li>
+        <li>Löschung (Art. 17 DSGVO)</li>
+        <li>Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+        <li>Datenübertragbarkeit (Art. 20 DSGVO)</li>
+        <li>Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)</li>
+      </ul>
+      <p>Zur Ausübung deiner Rechte genügt eine formlose Nachricht an die oben genannte Adresse.</p>
+      <h2>9. Beschwerderecht</h2>
+      <p>Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Zuständig ist der Hessische Beauftragte für Datenschutz und Informationsfreiheit, Gustav-Stresemann-Ring 1, 65189 Wiesbaden.</p>
+      <h2>10. Aktualität</h2>
+      <p>Stand: Oktober 2026. Ich passe diese Erklärung an, wenn sich die Seite oder die Rechtslage ändert.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Betreiber</h4>
+        <address><b style="color:var(--fg)">Ali Rasheed</b><br>0176 84602425<br>ali.rasheed6640@gmail.com</address>
+      </div>
+      <div>
+        <h4>Menü</h4>
+        <ul>
+          <li><a href="#startseite">Startseite</a></li>
+          <li><a href="#ueber-mich">Über mich</a></li>
+          <li><a href="#projekte">Projekte</a></li>
+          <li><a href="#blog">Blog</a></li>
+          <li><a href="#lernplan">Lernplan</a></li>
+          <li><a href="#kontakt">Kontakt</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="#impressum">Impressum</a></li>
+          <li><a href="#datenschutz">Datenschutzerklärung</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="small"><span>© 2026 Ali Rasheed. Alle Rechte vorbehalten.</span><span class="mono">Made in Hanau</span></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var pages = ['startseite','ueber-mich','projekte','blog','lernplan','kontakt','impressum','datenschutz'];
+  var nav = document.getElementById('nav'), burger = document.getElementById('burger');
+  var names = { 'startseite': 'Startseite', 'ueber-mich': 'Über mich', 'projekte': 'Projekte', 'blog': 'Blog', 'lernplan': 'Lernplan', 'kontakt': 'Kontakt', 'impressum': 'Impressum', 'datenschutz': 'Datenschutz' };
+  var rm = false; try { rm = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var wipe = document.getElementById('wipe'), b1 = wipe.querySelector('.b1'), b2 = wipe.querySelector('.b2');
+  var wname = document.getElementById('wname'), wfill = document.getElementById('wfill');
+  var current = null, want = 'startseite', busy = false, anims = [], guard = null;
+  function fromHash() {
+    var h = ''; try { h = (location.hash || '').replace('#', ''); } catch (e) {}
+    return pages.indexOf(h) < 0 ? 'startseite' : h;
+  }
+  function show(h) {
+    current = h;
+    pages.forEach(function (p) {
+      var el = document.getElementById('p-' + p);
+      if (el) el.classList.toggle('show', p === h);
+    });
+    document.querySelectorAll('[data-link]').forEach(function (a) {
+      var on = a.getAttribute('data-link') === h;
+      a.classList.toggle('on', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    nav.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
+    try { window.scrollTo(0, 0); } catch (e) {}
+    try { if (h === 'startseite' && cv && ctx) size(); } catch (e) {}
+  }
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function play(el, frames, opts) {
+    opts.fill = 'forwards'; var a = el.animate(frames, opts); anims.push(a);
+    return a.finished ? a.finished.catch(function () {}) : wait(opts.duration + (opts.delay || 0));
+  }
+  function cleanup() {
+    clearTimeout(guard);
+    anims.forEach(function (a) { try { a.cancel(); } catch (e) {} }); anims = [];
+    wipe.classList.remove('on'); busy = false;
+  }
+  function run() {
+    if (rm || !wipe.animate || current === null) { show(want); return; }
+    if (busy || want === current) return;
+    busy = true;
+    nav.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
+    wname.textContent = names[want]; wipe.classList.add('on');
+    guard = setTimeout(function () { show(want); cleanup(); }, 2500);
+    var ease = 'cubic-bezier(.7,0,.25,1)';
+    var X0 = { transform: 'translateX(-101%)' }, X1 = { transform: 'translateX(0)' }, X2 = { transform: 'translateX(101%)' };
+    play(b1, [X0, X1], { duration: 260, easing: ease });
+    play(b2, [X0, X1], { duration: 260, easing: ease, delay: 90 }).then(function () {
+      show(want);
+      play(wfill, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 260, easing: 'ease-out' });
+      return wait(280);
+    }).then(function () {
+      play(b2, [X1, X2], { duration: 300, easing: ease });
+      return play(b1, [X1, X2], { duration: 300, easing: ease, delay: 90 });
+    }).then(function () {
+      cleanup();
+      if (want !== current) run();
+    }, function () { show(want); cleanup(); });
+  }
+  function go(h) {
+    want = h;
+    try { if (location.hash !== '#' + h) location.hash = h; } catch (e) {}
+    run();
+  }
+  window.addEventListener('hashchange', function () { want = fromHash(); run(); });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var h = a.getAttribute('href').slice(1);
+    if (pages.indexOf(h) < 0) return;
+    e.preventDefault(); go(h);
+  });
+  want = fromHash(); show(want);
+  burger.addEventListener('click', function () {
+    var o = nav.classList.toggle('open'); burger.setAttribute('aria-expanded', o ? 'true' : 'false');
+  });
+
+  // Copy buttons
+  document.querySelectorAll('.copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = b.getAttribute('data-copy');
+      function done() { b.textContent = 'Kopiert'; setTimeout(function () { b.textContent = 'Kopieren'; }, 1500); }
+      function fallback() {
+        var r = document.createRange(); r.selectNodeContents(b.parentNode.querySelector('.v'));
+        var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Markiert';
+        setTimeout(function () { b.textContent = 'Kopieren'; }, 1500);
+      }
+      try { navigator.clipboard.writeText(t).then(done, fallback); } catch (e) { fallback(); }
+    });
+  });
+
+  // Greeting loop
+  var words = ['Willkommen', 'Hallo', 'Welcome', 'خوش آمدید', 'Moin'];
+  var wEl = document.getElementById('word'), wi = 0, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) setInterval(function () { wi = (wi + 1) % words.length; wEl.textContent = words[wi]; }, 2400);
+
+  // Hero particles
+  var cv = document.getElementById('fx'), ctx = cv.getContext('2d'), pts = [], W = 0, H = 0;
+  function size() {
+    var r = cv.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    pts = []; var n = Math.round(W * H / 14000);
+    for (var i = 0; i < n; i++) pts.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25 });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      if (!reduce) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1; }
+      ctx.fillStyle = 'rgba(25,227,193,.8)'; ctx.fillRect(p.x, p.y, 2.5, 2.5);
+      for (var j = i + 1; j < pts.length; j++) {
+        var q = pts[j], dx = p.x - q.x, dy = p.y - q.y, dd = dx * dx + dy * dy;
+        if (dd < 9000) { ctx.strokeStyle = 'rgba(124,92,255,' + (0.35 * (1 - dd / 9000)) + ')'; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke(); }
+      }
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  size(); draw();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { size(); if (reduce) draw(); }, 150); });
+})();
+</script>
+
+</body>
+</html>
